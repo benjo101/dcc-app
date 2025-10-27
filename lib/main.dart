@@ -31,44 +31,53 @@ class DccApp extends StatelessWidget {
         title: 'DCC',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: colorScheme,
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF6F7FB),
-          textTheme: Typography.blackCupertino.apply(
-            bodyColor: const Color(0xFF0E1116),
-            displayColor: const Color(0xFF0E1116),
-          ),
-          appBarTheme: const AppBarTheme(
-            elevation: 0,
-            centerTitle: true,
-            backgroundColor: Colors.transparent,
-            foregroundColor: Color(0xFF0E1116),
-          ),
-          cardTheme: const CardThemeData(
-            color: Colors.white,
-            surfaceTintColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-            ),
-            elevation: 0,
-          ),
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
-            ),
-          ),
-          navigationBarTheme: NavigationBarThemeData(
-            indicatorColor: colorScheme.primary.withOpacity(.12),
-            backgroundColor: Colors.white,
-            labelTextStyle: WidgetStatePropertyAll(
-              const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ),
+  colorScheme: const ColorScheme.dark(
+    brightness: Brightness.dark,
+    primary: Color(0xFFFFD347),
+    secondary: Color(0xFFFFD347),
+    background: Color(0xFF0E0E0E),
+    surface: Color(0xFF1A1A1A),
+  ),
+  useMaterial3: true,
+  scaffoldBackgroundColor: const Color(0xFF0E0E0E),
+  cardTheme: const CardThemeData(
+    color: Color(0xFF1A1A1A),
+    surfaceTintColor: Colors.transparent,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(16)),
+    ),
+    elevation: 2,
+    shadowColor: Colors.black54,
+  ),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Color(0xFF0E0E0E),
+    foregroundColor: Colors.white,
+    elevation: 0,
+    centerTitle: true,
+  ),
+  textTheme: const TextTheme(
+    bodyMedium: TextStyle(color: Colors.white70),
+    bodyLarge: TextStyle(color: Colors.white),
+    titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: const Color(0xFF1C1C1C),
+    hintStyle: const TextStyle(color: Colors.white54),
+    prefixIconColor: Colors.white54,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide.none,
+    ),
+  ),
+  navigationBarTheme: const NavigationBarThemeData(
+    backgroundColor: Color(0xFF1A1A1A),
+    indicatorColor: Color(0xFFFFD347),
+    labelTextStyle: WidgetStatePropertyAll(
+      TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+    ),
+  ),
+),
         home: const _RootTabs(),
       ),
     );
