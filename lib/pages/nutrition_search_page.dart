@@ -231,7 +231,7 @@ class _NutritionSearchPageState extends State<NutritionSearchPage> {
             TextField(
               controller: _controller,
               decoration: const InputDecoration(
-                hintText: 'Search for a food or brand...',
+                hintText: 'Search for a food or a brand...',
                 prefixIcon: Icon(Icons.search),
               ),
               textInputAction: TextInputAction.search,
