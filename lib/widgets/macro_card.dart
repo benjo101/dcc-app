@@ -19,34 +19,29 @@ class MacroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Card(
-      color: const Color(0xFF1C1C1C),
+      color: const Color(0xFF1A1A1A),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title.toUpperCase(),
+            Text(title,
                 style: const TextStyle(
                     color: Colors.white70,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                    letterSpacing: 0.5)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Text(value,
-                    style: const TextStyle(
-                        fontSize: 22,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800)),
-                const SizedBox(width: 6),
-                Text('/ $target',
-                    style:
-                        const TextStyle(fontSize: 13, color: Colors.white54)),
-              ],
-            ),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14)),
+            const SizedBox(height: 6),
+            Text(value,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800)),
+            const SizedBox(height: 6),
+            Text(target,
+                style: const TextStyle(
+                    color: Colors.white54,
+                    fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -54,8 +49,8 @@ class MacroCard extends StatelessWidget {
                 value: progress.clamp(0, 1),
                 minHeight: 8,
                 backgroundColor: const Color(0xFF2A2A2A),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  isKcal ? cs.primary : const Color(0xFFFFD347),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color(0xFFFFD347),
                 ),
               ),
             ),
@@ -65,4 +60,3 @@ class MacroCard extends StatelessWidget {
     );
   }
 }
-

@@ -15,118 +15,91 @@ class DiaryPage extends StatelessWidget {
     final prov = context.watch<DiaryProvider>();
     final totals = prov.totalsFor(today);
 
-    String g(double v) => v.toStringAsFixed(v % 1 == 0 ? 0 : 1);
-
-    Widget topHeader() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            const Text('Today',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22)),
-            const Spacer(),
-            TextButton(onPressed: () {}, child: const Text('Overview')),
-            const SizedBox(width: 4),
-            const CircleAvatar(
-              radius: 16,
-              backgroundColor: Color(0xFF4C6FFF),
-              child: Text('D',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-            ),
-          ],
-        ),
-      );
-    }
-
-    double kcalProg =
-        prov.calorieGoal <= 0 ? 0 : (totals.kcal / prov.calorieGoal);
     const pGoal = 180.0, cGoal = 400.0, fGoal = 80.0;
     final pProg = totals.proteinG / pGoal;
     final cProg = totals.carbsG / cGoal;
     final fProg = totals.fatG / fGoal;
+    final kcalProg =
+        prov.calorieGoal <= 0 ? 0 : (totals.kcal / prov.calorieGoal);
 
-    Widget macroGrid() {
+    String g(double v) =>
+        v.toStringAsFixed(v % 1 == 0 ? 0 : 1).replaceAll('.0', '');
+
+    Widget header() {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: GridView.count(
-          crossAxisCount: 2,
-          childAspectRatio: 1.5,
-          shrinkWrap: true,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            MacroCard(
-                title: 'Protein',
-                value: '${g(totals.proteinG)}g',
-                target: '${g(pGoal)}g',
-                progress: pProg),
-            MacroCard(
-                title: 'Carbs',
-                value: '${g(totals.carbsG)}g',
-                target: '${g(cGoal)}g',
-                progress: cProg),
-            MacroCard(
-                title: 'Fat',
-                value: '${g(totals.fatG)}g',
-                target: '${g(fGoal)}g',
-                progress: fProg),
-            MacroCard(
-                title: 'KCAL',
-                value: g(totals.kcal),
-                target: g(prov.calorieGoal),
-                progress: kcalProg,
-                isKcal: true),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            Text('Today',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800)),
+            Text('Overview',
+                style: TextStyle(
+                    color: Colors.white54,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16)),
+            Text('DCC',
+                style: TextStyle(
+                    color: Color(0xFFFFD347),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20)),
           ],
         ),
       );
     }
 
-    Widget goalRow() {
+    Widget macroSection() {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 1.3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           children: [
-            const Text('Goal', style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(width: 8),
-            InkWell(
-              onTap: () async {
-                final controller = TextEditingController(
-                    text: prov.calorieGoal.round().toString());
-                final v = await showDialog<double>(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Set daily kcal goal'),
-                    content: TextField(
-                      controller: controller,
-                      keyboardType: TextInputType.number,
-                      decoration:
-                          const InputDecoration(hintText: 'e.g. 2400'),
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancel')),
-                      TextButton(
-                          onPressed: () {
-                            final vv =
-                                double.tryParse(controller.text.trim());
-                            Navigator.pop(context, vv);
-                          },
-                          child: const Text('Save')),
-                    ],
-                  ),
-                );
-                if (v != null) prov.calorieGoal = v;
-              },
-              child: Text('${prov.calorieGoal.round()} kcal',
-                  style:
-                      const TextStyle(decoration: TextDecoration.underline)),
+            MacroCard(
+              title: 'Protein',
+              value: '${g(totals.proteinG)}',
+              target: '${g(pGoal)}g',
+              progress: pProg,
             ),
-            const Spacer(),
-            Text('${totals.kcal.round()} / ${prov.calorieGoal.round()}'),
+            MacroCard(
+              title: 'Carbs',
+              value: '${g(totals.carbsG)}',
+              target: '${g(cGoal)}g',
+              progress: cProg,
+            ),
+            MacroCard(
+              title: 'Fat',
+              value: '${g(totals.fatG)}',
+              target: '${g(fGoal)}g',
+              progress: fProg,
+            ),
+            MacroCard(
+              title: 'KCAL',
+              value: '${g(totals.kcal)}',
+              target: '${g(prov.calorieGoal)}',
+              progress: kcalProg.toDouble(),
+              isKcal: true,
+            ),
           ],
         ),
+      );
+    }
+
+    Widget programsBanner() {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        child: Text('Programs out!',
+            style: TextStyle(
+                color: Color(0xFFFFD347),
+                fontWeight: FontWeight.bold,
+                fontSize: 16)),
       );
     }
 
@@ -137,6 +110,7 @@ class DiaryPage extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Card(
+          color: const Color(0xFF1A1A1A),
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -145,14 +119,20 @@ class DiaryPage extends StatelessWidget {
                 Row(children: [
                   Text(mealTypeLabel(meal),
                       style: const TextStyle(
-                          fontWeight: FontWeight.w800, fontSize: 16)),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16)),
                   const Spacer(),
-                  Text('${mTot.kcal.round()} kcal',
-                      style:
-                          const TextStyle(fontWeight: FontWeight.w700)),
+                  Text('${mTot.kcal.round()}',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 4),
+                  const Text('kcal',
+                      style: TextStyle(color: Colors.white54, fontSize: 12)),
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline,
-                        color: Color(0xFF4C6FFF)),
+                        color: Color(0xFFFFD347)),
                     tooltip: 'Add food',
                     onPressed: () {
                       Navigator.push(
@@ -165,40 +145,41 @@ class DiaryPage extends StatelessWidget {
                     },
                   ),
                 ]),
-                const SizedBox(height: 6),
-                Text(
-                  '${g(mTot.proteinG)}g P • ${g(mTot.carbsG)}g C • ${g(mTot.fatG)}g F',
-                  style: const TextStyle(fontSize: 12, color: Colors.black54),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 if (list.isEmpty)
-                  const Text('Nothing added yet',
-                      style: TextStyle(color: Colors.black54))
+                  const Text('No foods added',
+                      style: TextStyle(color: Colors.white54))
                 else
-                  ...list.map((e) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(e.food.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600)),
-                        subtitle: Text('${e.grams.round()} g • '
-                            '${g(e.proteinG)}g P • ${g(e.carbsG)}g C • ${g(e.fatG)}g F'),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('${e.kcal.round()}',
+                  ...list.map(
+                    (e) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(e.food.name,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w700)),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              onPressed: () =>
-                                  prov.removeEntry(e.id, today),
-                              tooltip: 'Remove',
-                            ),
-                          ],
-                        ),
-                      )),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600)),
+                          ),
+                          Text('${e.kcal.round()}',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                  ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text('More',
+                        style: TextStyle(
+                            color: Color(0xFFFFD347),
+                            fontWeight: FontWeight.w700)),
+                  ),
+                ),
               ],
             ),
           ),
@@ -207,34 +188,17 @@ class DiaryPage extends StatelessWidget {
     }
 
     return SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: const Text('DCC',
-                style: TextStyle(fontWeight: FontWeight.w800)),
-            centerTitle: true,
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                topHeader(),
-                const SizedBox(height: 12),
-                macroGrid(),
-                const SizedBox(height: 10),
-                goalRow(),
-                const SizedBox(height: 8),
-                mealSection(MealType.breakfast),
-                mealSection(MealType.lunch),
-                mealSection(MealType.dinner),
-                mealSection(MealType.snacks),
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
+      child: ListView(
+        children: [
+          header(),
+          programsBanner(),
+          macroSection(),
+          const SizedBox(height: 10),
+          mealSection(MealType.breakfast),
+          mealSection(MealType.lunch),
+          mealSection(MealType.dinner),
+          mealSection(MealType.snacks),
+          const SizedBox(height: 20),
         ],
       ),
     );
