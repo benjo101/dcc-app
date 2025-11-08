@@ -6,6 +6,9 @@ import '../services/food_api.dart';
 import '../models/food_item.dart';
 import '../models/diary_entry.dart';
 import '../providers/diary_provider.dart';
+import 'barcode_scan_page.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+
 
 class NutritionSearchPage extends StatefulWidget {
   final MealType? preselectedMeal;
@@ -23,6 +26,24 @@ class _NutritionSearchPageState extends State<NutritionSearchPage> {
   bool _loading = false;
   String _error = '';
   List<FoodItem> _results = [];
+
+  // Quick picks att visa när sidan är “tom”
+  final List<String> _quickPicks = const [
+    'chicken',
+    'rice',
+    'egg',
+    'banana',
+    'oats',
+    'milk',
+    'yogurt',
+    'salmon',
+    'bread',
+    'pasta',
+    'keso',
+    'estrella',
+    'marabou',
+    'knäckebröd',
+  ];
 
   @override
   void initState() {
@@ -66,6 +87,17 @@ class _NutritionSearchPageState extends State<NutritionSearchPage> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _handleScan() async {
+    final item = await Navigator.push<FoodItem>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScanPage()),
+    );
+    if (!mounted || item == null) return;
+
+    // Direkt in i add-to-diary flow
+    await _addFoodFlow(item);
   }
 
   Future<void> _addFoodFlow(FoodItem f) async {
@@ -214,15 +246,63 @@ class _NutritionSearchPageState extends State<NutritionSearchPage> {
     );
   }
 
+  Widget _quickPicksSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        const Text('Quick picks',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: -6,
+          children: _quickPicks.map((t) {
+            return ActionChip(
+              label: Text(t),
+              onPressed: () {
+                _controller.text = t;
+                _controller.selection = TextSelection.fromPosition(
+                  TextPosition(offset: _controller.text.length),
+                );
+                _search(t);
+              },
+              backgroundColor: const Color(0xFF1C1C1C),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Color(0x33FFFFFF)),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final meal = widget.preselectedMeal;
     final title = meal != null ? 'Add to ${mealTypeLabel(meal)}' : 'Search Food';
 
+    final isEmptyState = _controller.text.trim().length < 2 && !_loading && _results.isEmpty;
+    final scanSupported = kIsWeb ||
+    defaultTargetPlatform == TargetPlatform.android ||
+    defaultTargetPlatform == TargetPlatform.iOS;
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
         centerTitle: true,
+        actions: [
+       if (scanSupported)
+        IconButton(
+         tooltip: 'Scan barcode',
+         icon: const Icon(Icons.qr_code_scanner),
+         onPressed: _handleScan,
+        ),
+       ],
+
       ),
       body: SafeArea(
         child: ListView(
@@ -238,12 +318,16 @@ class _NutritionSearchPageState extends State<NutritionSearchPage> {
               onSubmitted: _search,
             ),
             const SizedBox(height: 12),
+
+            if (isEmptyState) _quickPicksSection(),
+
             if (_loading)
               const Center(
-                  child: Padding(
-                padding: EdgeInsets.only(top: 30),
-                child: CircularProgressIndicator(),
-              ))
+                child: Padding(
+                  padding: EdgeInsets.only(top: 30),
+                  child: CircularProgressIndicator(),
+                ),
+              )
             else if (_error.isNotEmpty)
               Text(_error,
                   style: TextStyle(color: Theme.of(context).colorScheme.error))

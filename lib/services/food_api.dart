@@ -116,4 +116,25 @@ class FoodApi {
     }
     return [];
   }
+    /// Hämtar produkt via streckkod (Open Food Facts)
+  Future<FoodItem?> getFoodByBarcode(String barcode) async {
+    if (barcode.isEmpty) return null;
+
+    final uri = Uri.parse('$_baseHost/api/v2/product/$barcode.json');
+    final res = await http.get(uri, headers: _headers);
+
+    if (res.statusCode != 200) return null;
+
+    final data = json.decode(res.body);
+    final product = data['product'] as Map<String, dynamic>?;
+
+    if (product == null) return null;
+
+    try {
+      return FoodItem.fromOpenFoodFactsProduct(product);
+    } catch (_) {
+      return null;
+    }
+  }
+
 }

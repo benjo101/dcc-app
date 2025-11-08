@@ -15,12 +15,14 @@ class DiaryPage extends StatelessWidget {
     final prov = context.watch<DiaryProvider>();
     final totals = prov.totalsFor(today);
 
+    // Dagens mål (exempel)
     const pGoal = 180.0, cGoal = 400.0, fGoal = 80.0;
-    final pProg = totals.proteinG / pGoal;
-    final cProg = totals.carbsG / cGoal;
-    final fProg = totals.fatG / fGoal;
-    final kcalProg =
-        prov.calorieGoal <= 0 ? 0 : (totals.kcal / prov.calorieGoal);
+    final pProg = pGoal <= 0 ? 0.0 : (totals.proteinG / pGoal);
+    final cProg = cGoal <= 0 ? 0.0 : (totals.carbsG / cGoal);
+    final fProg = fGoal <= 0 ? 0.0 : (totals.fatG / fGoal);
+    final kcalProg = prov.calorieGoal <= 0
+        ? 0.0
+        : (totals.kcal / prov.calorieGoal);
 
     String g(double v) =>
         v.toStringAsFixed(v % 1 == 0 ? 0 : 1).replaceAll('.0', '');
@@ -31,21 +33,30 @@ class DiaryPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: const [
-            Text('Today',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800)),
-            Text('Overview',
-                style: TextStyle(
-                    color: Colors.white54,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16)),
-            Text('DCC',
-                style: TextStyle(
-                    color: Color(0xFFFFD347),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20)),
+            Text(
+              'Today',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text(
+              'Overview',
+              style: TextStyle(
+                color: Colors.white54,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            Text(
+              'DCC',
+              style: TextStyle(
+                color: Color(0xFFFFD347),
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+              ),
+            ),
           ],
         ),
       );
@@ -64,27 +75,27 @@ class DiaryPage extends StatelessWidget {
           children: [
             MacroCard(
               title: 'Protein',
-              value: '${g(totals.proteinG)}',
+              value: g(totals.proteinG),
               target: '${g(pGoal)}g',
-              progress: pProg,
+              progress: pProg.clamp(0.0, 1.0),
             ),
             MacroCard(
               title: 'Carbs',
-              value: '${g(totals.carbsG)}',
+              value: g(totals.carbsG),
               target: '${g(cGoal)}g',
-              progress: cProg,
+              progress: cProg.clamp(0.0, 1.0),
             ),
             MacroCard(
               title: 'Fat',
-              value: '${g(totals.fatG)}',
+              value: g(totals.fatG),
               target: '${g(fGoal)}g',
-              progress: fProg,
+              progress: fProg.clamp(0.0, 1.0),
             ),
             MacroCard(
               title: 'KCAL',
-              value: '${g(totals.kcal)}',
-              target: '${g(prov.calorieGoal)}',
-              progress: kcalProg.toDouble(),
+              value: g(totals.kcal),
+              target: g(prov.calorieGoal),
+              progress: kcalProg.clamp(0.0, 1.0),
               isKcal: true,
             ),
           ],
@@ -95,11 +106,14 @@ class DiaryPage extends StatelessWidget {
     Widget programsBanner() {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        child: Text('Programs out!',
-            style: TextStyle(
-                color: Color(0xFFFFD347),
-                fontWeight: FontWeight.bold,
-                fontSize: 16)),
+        child: Text(
+          'Programs out!',
+          style: TextStyle(
+            color: Color(0xFFFFD347),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       );
     }
 
@@ -117,22 +131,32 @@ class DiaryPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(children: [
-                  Text(mealTypeLabel(meal),
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16)),
+                  Text(
+                    mealTypeLabel(meal),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
                   const Spacer(),
-                  Text('${mTot.kcal.round()}',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    '${mTot.kcal.round()}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(width: 4),
-                  const Text('kcal',
-                      style: TextStyle(color: Colors.white54, fontSize: 12)),
+                  const Text(
+                    'kcal',
+                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                   IconButton(
-                    icon: const Icon(Icons.add_circle_outline,
-                        color: Color(0xFFFFD347)),
+                    icon: const Icon(
+                      Icons.add_circle_outline,
+                      color: Color(0xFFFFD347),
+                    ),
                     tooltip: 'Add food',
                     onPressed: () {
                       Navigator.push(
@@ -147,8 +171,10 @@ class DiaryPage extends StatelessWidget {
                 ]),
                 const SizedBox(height: 8),
                 if (list.isEmpty)
-                  const Text('No foods added',
-                      style: TextStyle(color: Colors.white54))
+                  const Text(
+                    'No foods added',
+                    style: TextStyle(color: Colors.white54),
+                  )
                 else
                   ...list.map(
                     (e) => Padding(
@@ -157,15 +183,22 @@ class DiaryPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text(e.food.name,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600)),
-                          ),
-                          Text('${e.kcal.round()}',
+                            child: Text(
+                              e.food.name,
                               style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700)),
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            '${e.kcal.round()}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -174,10 +207,13 @@ class DiaryPage extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
-                    child: const Text('More',
-                        style: TextStyle(
-                            color: Color(0xFFFFD347),
-                            fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'More',
+                      style: TextStyle(
+                        color: Color(0xFFFFD347),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ],
